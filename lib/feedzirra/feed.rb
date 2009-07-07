@@ -107,7 +107,9 @@ module Feedzirra
       urls.is_a?(String) ? responses.values.first : responses
     end
 
-    # Fetches and returns the parsed XML for each URL provided.
+    # Fetches and returns the parsed XML for each URL provided. If cURL is
+    # installed then it will be used to retrieve the data, otherwise OpenURI
+    # will be used.
     #
     # === Parameters
     # [urls<String> or <Array>] A single feed URL, or an array of feed URLs.
@@ -115,25 +117,69 @@ module Feedzirra
     # * :user_agent - String that overrides the default user agent.
     # * :if_modified_since - Time object representing when the feed was last updated.
     # * :if_none_match - String, an etag for the request that was stored previously.
-    # * :on_success - Block that gets executed after a successful request.
-    # * :on_failure - Block that gets executed after a failed request.
+    # * :on_success - Block that gets executed after a successful request (cURL only).
+    # * :on_failure - Block that gets executed after a failed request (cURL only).
     # === Returns
     # A Feed object if a single URL is passed.
     #
-    # A Hash if multiple URL's are passed. The key will be the URL, and the value the Feed object.
+    # A Hash if multiple URL's are passed as an array. The key will be the URL, and the value the Feed object.
     def self.fetch_and_parse(urls, options = {})
       url_queue = [*urls]
-      multi = Curl::Multi.new
-      responses = {}
+      if Feedzirra.use_curb?
+        multi = Curl::Multi.new
+        responses = {}
       
-      # I broke these down so I would only try to do 30 simultaneously because
-      # I was getting weird errors when doing a lot. As one finishes it pops another off the queue.
-      url_queue.slice!(0, 30).each do |url|
-        add_url_to_multi(multi, url, url_queue, responses, options)
-      end
+        # I broke these down so I would only try to do 30 simultaneously because
+        # I was getting weird errors when doing a lot. As one finishes it pops another off the queue.
+        url_queue.slice!(0, 30).each do |url|
+          add_url_to_multi(multi, url, url_queue, responses, options)
+        end
  
-      multi.perform
+        multi.perform
+        
+      else
+        responses = {}
+        url_queue.each do |url|
+          headers = {}
+          headers['if-modified-since'] = options[:if_modified_since] if options[:if_modified_since]
+          headers['if-none-match'] = options[:if_none_match] if options[:if_none_match]
+          
+          open(url, headers) do |f|
+            responses[url] = try_parse(url, f.status[0], f.meta, f.read)
+          end
+        end
+      end
       return urls.is_a?(String) ? responses.values.first : responses
+    end
+    
+    def self.try_parse(url, response_code, headers, body)
+      xml = decode_content2(headers, body)
+      klass = determine_feed_parser_for_xml(xml)
+      
+      if klass
+        begin
+          feed = klass.parse(xml)
+          feed.feed_url = url
+          feed.etag = headers['etag']
+          feed.last_modified = headers['last-modified']
+          feed
+        rescue Exception => e
+          response_code
+        end
+      else
+        response_code
+      end
+    end
+    
+    # Decodes the body if the Content-encoding is either gzip or deflate.
+    def self.decode_content2(headers, body)
+      if headers['content-encoding'] == 'gzip'
+        decompress(body)
+      elsif headers['content-encoding'] == 'deflate'
+        inflate(body)
+      else
+        body
+      end
     end
 
     # Decodes the XML document if it was compressed.
@@ -144,21 +190,41 @@ module Feedzirra
     # A decoded string of XML.
     def self.decode_content(c)
       if c.header_str.match(/Content-Encoding: gzip/)
-        begin
-          gz =  Zlib::GzipReader.new(StringIO.new(c.body_str))
-          xml = gz.read
-          gz.close
-        rescue Zlib::GzipFile::Error 
-          # Maybe this is not gzipped?
-          xml = c.body_str
-        end
+        xml = decompress(c.body_str)
       elsif c.header_str.match(/Content-Encoding: deflate/)
-        xml = Zlib::Inflate.inflate(c.body_str)
+        xml = inflate(c.body_str)
       else
         xml = c.body_str
       end
 
       xml
+    end
+    
+    # Decompress the XML string if it is compressed.
+    #
+    # === Parameters
+    # [s<String>] The gzipped XML string
+    # === Returns
+    # An decompressed XML string
+    def self.decompress(s)
+      begin
+        gz =  Zlib::GzipReader.new(StringIO.new(s))
+        xml = gz.read
+        gz.close
+      rescue Zlib::GzipFile::Error 
+        # Maybe this is not gzipped?
+        xml = s
+      end
+    end
+    
+    # Inflate the XML string if it was delated.
+    #
+    # === Parameters
+    # [s<String>] The XML string
+    # === Returns
+    # An inflated XML string
+    def self.inflate(s)
+     Zlib::Inflate.inflate(s)
     end
 
     # Updates each feed for each Feed object provided.
