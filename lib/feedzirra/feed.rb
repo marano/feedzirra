@@ -164,10 +164,10 @@ module Feedzirra
           feed.last_modified = headers['last-modified']
           feed
         rescue Exception => e
-          response_code
+          "Error: Exception while parsing #{url}: #{e.message}"
         end
       else
-        response_code
+        "Error: Cannot determine feed parser for #{url}"
       end
     end
     
