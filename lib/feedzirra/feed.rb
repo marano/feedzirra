@@ -140,16 +140,31 @@ module Feedzirra
       else
         responses = {}
         url_queue.each do |url|
-          headers = {}
-          headers['if-modified-since'] = options[:if_modified_since] if options[:if_modified_since]
-          headers['if-none-match'] = options[:if_none_match] if options[:if_none_match]
-          
-          open(url, headers) do |f|
-            responses[url] = try_parse(url, f.status[0], f.meta, f.read)
-          end
+          res = fetch_url(url)
+          responses[url] = try_parse(url, res.code, res, res.body)
         end
       end
       return urls.is_a?(String) ? responses.values.first : responses
+    end
+    
+    def self.fetch_url(url, limit=10, options={})
+      raise RuntimeError, "HTTP redirect too deep" if limit == 0
+      
+      uri = URI.parse(url)
+      req = Net::HTTP::Get.new(uri.path)
+      req['if-modified-since'] = options[:if_modified_since] if options[:if_modified_since]
+      req['if-none-match'] = options[:if_none_match] if options[:if_none_match]
+      res = Net::HTTP.start(uri.host, uri.port) do |http|
+        http.request(req)
+      end
+      
+      # Handle HTTP redirect
+      case res
+      when Net::HTTPSuccess then res
+      when Net::HTTPRedirection then fetch_url(res['location'], limit - 1)
+      else
+        response.error!
+      end
     end
     
     def self.try_parse(url, response_code, headers, body)

@@ -7,7 +7,7 @@ module Feedzirra
   def self.use_curb?
     @use_curb
   end
-  VERSION = "0.0.15"
+  VERSION = "0.0.16"
 end
 
 gem 'activesupport'
@@ -21,7 +21,7 @@ rescue LoadError
   Feedzirra.use_curb = false
 end
 
-require 'open-uri'
+require 'net/http'
 require 'sax-machine'
 require 'dryopteris'
 require 'uri'
