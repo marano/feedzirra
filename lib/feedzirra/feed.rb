@@ -163,7 +163,7 @@ module Feedzirra
       when Net::HTTPSuccess then res
       when Net::HTTPRedirection then fetch_url(res['location'], limit - 1)
       else
-        response.error!
+        res.error!
       end
     end
     
