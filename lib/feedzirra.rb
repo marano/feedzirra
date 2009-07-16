@@ -7,7 +7,7 @@ module Feedzirra
   def self.use_curb?
     @use_curb
   end
-  VERSION = "0.0.16"
+  VERSION = "0.0.17"
 end
 
 gem 'activesupport'
