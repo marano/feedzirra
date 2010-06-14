@@ -44,7 +44,7 @@ Gem::Specification.new do |s|
     "spec/feedzirra/feed_utilities_spec.rb",
     "spec/feedzirra/feed_entry_utilities_spec.rb"]
   s.has_rdoc = true
-  s.homepage = %q{http://github.com/pauldix/feedzirra}
+  s.homepage = %q{http://github.com/marano/feedzirra}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.1}
   s.summary = %q{A feed fetching and parsing library that treats the internet like Godzilla treats Japan: it dominates and eats all.}
