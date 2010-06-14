@@ -1,3 +1,5 @@
+This project adds custom parsers for Flickr and Youtube, based on /adamwiggins gists, and enables them as defaults.
+
 == Feedzirra
 
 I'd like feedback on the api and any bugs encountered on feeds in the wild. I've set up a {google group here}[http://groups.google.com/group/feedzirra].
