@@ -33,11 +33,11 @@ require 'feedzirra/parser/itunes_rss'
 require 'feedzirra/parser/atom'
 require 'feedzirra/parser/atom_feed_burner'
 
-require 'feedzirra/parser/flickr'
 require 'feedzirra/parser/flickr_entry'
+require 'feedzirra/parser/flickr'
 
-require 'feedzirra/parser/youtube'
 require 'feedzirra/parser/youtube_entry'
+require 'feedzirra/parser/youtube'
 
 module Feedzirra
   VERSION = "0.0.23"
