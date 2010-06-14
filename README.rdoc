@@ -1,6 +1,6 @@
 This fork adds custom parsers for Flickr and Youtube, based on /adamwiggins gists, and enables them as defaults.
 
-=====================
+===================================================
 
 == Feedzirra
 
