@@ -5,7 +5,7 @@ module Feedzirra
     class FlickrEntry
       include SAXMachine
       include FeedEntryUtilities
-      element :guid, :as => :id
+      element :guid, :as => :entry_id
       
       element :title
       element :"media:title", :as => :title
