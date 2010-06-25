@@ -1,5 +1,6 @@
 require "rubygems"
 require "spec"
+require "fakeweb"
 
 # gem install redgreen for colored test output
 begin require "redgreen" unless ENV['TM_CURRENT_LINE']; rescue LoadError; end
@@ -8,6 +9,8 @@ path = File.expand_path(File.dirname(__FILE__) + "/../lib/")
 $LOAD_PATH.unshift(path) unless $LOAD_PATH.include?(path)
 
 require "lib/feedzirra"
+
+FakeWeb.allow_net_connect = false
 
 def load_sample(filename)
   File.read("#{File.dirname(__FILE__)}/sample_feeds/#{filename}")
@@ -55,4 +58,12 @@ end
 
 def sample_wfw_feed
   load_sample("PaulDixExplainsNothingWFW.xml")
+end
+
+def sample_engadget_feed
+  load_sample("engadget.xml")
+end
+
+def sample_gizmodo_feed
+  load_sample("gizmodo.xml")
 end

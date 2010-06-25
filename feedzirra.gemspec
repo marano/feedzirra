@@ -59,12 +59,14 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<builder>, [">= 2.1.2"])
       s.add_runtime_dependency(%q<activesupport>, [">=2.0.0"])
       s.add_runtime_dependency(%q<loofah>, [">= 0.3.1"])
+      s.add_runtime_dependency(%q<fakeweb>, [">= 1.2.8"])
     else
       s.add_dependency(%q<nokogiri>, ["> 0.0.0"])
       s.add_dependency(%q<sax-machine>, [">= 0.0.12"])
       s.add_dependency(%q<builder>, [">= 2.1.2"])
       s.add_dependency(%q<activesupport>, [">=2.0.0"])
       s.add_dependency(%q<loofah>, [">= 0.3.1"])
+      s.add_dependency(%q<fakeweb>, [">= 1.2.8"])
     end
   else
     s.add_dependency(%q<nokogiri>, ["> 0.0.0"])
@@ -72,5 +74,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<builder>, [">= 2.1.2"])
     s.add_dependency(%q<activesupport>, [">=2.0.0"])
     s.add_dependency(%q<loofah>, [">= 0.3.1"])
+    s.add_dependency(%q<fakeweb>, [">= 1.2.8"])
   end
 end

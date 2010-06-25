@@ -525,19 +525,23 @@ describe Feedzirra::Feed do
         end
         it 'should initiate the fetching and parsing using Net::HTTP' do
           url = 'http://engadget.com/rss.xml'
+          FakeWeb.register_uri(:get, url, :body => "Hello World!")
           responses = Feedzirra::Feed.fetch_and_parse(url)
           responses.should_not == nil
         end
         it "should return a feed object if a single feed is passed in" do
           url = 'http://engadget.com/rss.xml'
+          FakeWeb.register_uri(:get, url, :body => sample_engadget_feed)
           responses = Feedzirra::Feed.fetch_and_parse(url)
           responses.title.should == 'Engadget'
           responses.entries.length.should == 40
         end
         it "should return an return an hash of feed objects if multiple feeds are passed in" do
-          responses = Feedzirra::Feed.fetch_and_parse(
-            ['http://engadget.com/rss.xml', 'http://gizmodo.com/index.xml']
-          )
+          engadgets_url = 'http://engadget.com/rss.xml'
+          gizmodo_url = 'http://gizmodo.com/index.xml'
+          FakeWeb.register_uri(:get, engadgets_url, :body => sample_engadget_feed)
+          FakeWeb.register_uri(:get, gizmodo_url, :body => sample_gizmodo_feed)
+          responses = Feedzirra::Feed.fetch_and_parse([engadgets_url, gizmodo_url])
           responses.length.should == 2
         end
       end
