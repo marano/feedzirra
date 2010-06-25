@@ -67,3 +67,7 @@ end
 def sample_gizmodo_feed
   load_sample("gizmodo.xml")
 end
+
+def sample_flickr_feed
+  load_sample("flickr.xml")
+end
