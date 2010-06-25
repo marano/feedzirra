@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Paul Dix"]
-  s.date = %q{2009-02-19}
+  s.date = %q{2001-02-19}
   s.email = %q{paul@pauldix.net}
   s.files = [
     "lib/core_ext/date.rb",
@@ -56,14 +56,12 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<nokogiri>, ["> 0.0.0"])
       s.add_runtime_dependency(%q<sax-machine>, [">= 0.0.12"])
-      s.add_runtime_dependency(%q<curb>, [">= 0.2.3"])
       s.add_runtime_dependency(%q<builder>, [">= 2.1.2"])
       s.add_runtime_dependency(%q<activesupport>, [">=2.0.0"])
       s.add_runtime_dependency(%q<loofah>, [">= 0.3.1"])
     else
       s.add_dependency(%q<nokogiri>, ["> 0.0.0"])
       s.add_dependency(%q<sax-machine>, [">= 0.0.12"])
-      s.add_dependency(%q<curb>, [">= 0.2.3"])
       s.add_dependency(%q<builder>, [">= 2.1.2"])
       s.add_dependency(%q<activesupport>, [">=2.0.0"])
       s.add_dependency(%q<loofah>, [">= 0.3.1"])
@@ -71,7 +69,6 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<nokogiri>, ["> 0.0.0"])
     s.add_dependency(%q<sax-machine>, [">= 0.0.12"])
-    s.add_dependency(%q<curb>, [">= 0.2.3"])
     s.add_dependency(%q<builder>, [">= 2.1.2"])
     s.add_dependency(%q<activesupport>, [">=2.0.0"])
     s.add_dependency(%q<loofah>, [">= 0.3.1"])

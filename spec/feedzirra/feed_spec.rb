@@ -235,10 +235,10 @@ describe Feedzirra::Feed do
 
     describe "#add_url_to_multi" do
       before(:each) do
-        @multi = Curl::Multi.new(@paul_feed[:url])
+        @multi = Curl::Multi.new
         @multi.stub!(:add)
         @easy_curl = Curl::Easy.new(@paul_feed[:url])
-        
+        #@multi.add @easy_curl
         Curl::Easy.should_receive(:new).and_yield(@easy_curl)
       end
 
@@ -377,7 +377,7 @@ describe Feedzirra::Feed do
 
     describe "#add_feed_to_multi" do
       before(:each) do
-        @multi = Curl::Multi.new(@paul_feed[:url])
+        @multi = Curl::Multi.new
         @multi.stub!(:add)
         @easy_curl = Curl::Easy.new(@paul_feed[:url])
         @feed = Feedzirra::Feed.parse(sample_feedburner_atom_feed)
@@ -504,11 +504,43 @@ describe Feedzirra::Feed do
     end
 
     describe "#fetch_and_parse" do
-      it 'should initiate the fetching and parsing using multicurl'
-      it "should pass any request options through to add_url_to_multi"
-      it 'should slice the feeds into groups of thirty for processing'
-      it "should return a feed object if a single feed is passed in"
-      it "should return an return an array of feed objects if multiple feeds are passed in"
+      describe "with curl" do
+        before(:each) do
+          Feedzirra.should_receive(:use_curb?).and_return(true)
+        end
+        it 'should initiate the fetching and parsing using multicurl' do
+          @curl_multi = mock('curl_multi')
+          @curl_multi.should_receive(:perform)
+          Curl::Multi.should_receive(:new).and_return(@curl_multi)
+          Feedzirra::Feed.fetch_and_parse('')
+        end
+        it "should pass any request options through to add_url_to_multi"
+        it 'should slice the feeds into groups of thirty for processing'
+        it "should return a feed object if a single feed is passed in"
+        it "should return an return an array of feed objects if multiple feeds are passed in"
+      end
+      describe "without curl" do
+        before(:each) do
+          Feedzirra.should_receive(:use_curb?).and_return(false)
+        end
+        it 'should initiate the fetching and parsing using Net::HTTP' do
+          url = 'http://engadget.com/rss.xml'
+          responses = Feedzirra::Feed.fetch_and_parse(url)
+          responses.should_not == nil
+        end
+        it "should return a feed object if a single feed is passed in" do
+          url = 'http://engadget.com/rss.xml'
+          responses = Feedzirra::Feed.fetch_and_parse(url)
+          responses.title.should == 'Engadget'
+          responses.entries.length.should == 40
+        end
+        it "should return an return an hash of feed objects if multiple feeds are passed in" do
+          responses = Feedzirra::Feed.fetch_and_parse(
+            ['http://engadget.com/rss.xml', 'http://gizmodo.com/index.xml']
+          )
+          responses.length.should == 2
+        end
+      end
     end
 
     describe "#decode_content" do

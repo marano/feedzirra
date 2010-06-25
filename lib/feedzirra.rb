@@ -1,7 +1,27 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__)) unless $LOAD_PATH.include?(File.dirname(__FILE__))
 
+module Feedzirra
+  def self.use_curb=(curb)
+    @use_curb = curb
+  end
+  def self.use_curb?
+    @use_curb
+  end
+  VERSION = "0.0.23"
+end
+
+#gem 'activesupport'
+
 require 'zlib'
-require 'curb'
+
+begin
+  require 'curb'
+  Feedzirra.use_curb = true
+rescue LoadError
+  Feedzirra.use_curb = false
+end
+
+require 'net/http'
 require 'sax-machine'
 require 'loofah'
 require 'uri'
@@ -27,18 +47,12 @@ require 'feedzirra/parser/itunes_rss_owner'
 require 'feedzirra/parser/itunes_rss_item'
 require 'feedzirra/parser/atom_entry'
 require 'feedzirra/parser/atom_feed_burner_entry'
+require 'feedzirra/parser/flickr_entry'
+require 'feedzirra/parser/youtube_entry'
 
 require 'feedzirra/parser/rss'
 require 'feedzirra/parser/itunes_rss'
 require 'feedzirra/parser/atom'
 require 'feedzirra/parser/atom_feed_burner'
-
-require 'feedzirra/parser/flickr_entry'
 require 'feedzirra/parser/flickr'
-
-require 'feedzirra/parser/youtube_entry'
 require 'feedzirra/parser/youtube'
-
-module Feedzirra
-  VERSION = "0.0.23"
-end
